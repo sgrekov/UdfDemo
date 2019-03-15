@@ -1,6 +1,5 @@
 package com.udf.showcase.main.presenter
 
-
 import com.factorymarket.rxelm.cmd.CancelByClassCmd
 import com.factorymarket.rxelm.cmd.Cmd
 import com.factorymarket.rxelm.cmd.None
@@ -17,14 +16,17 @@ import com.udf.showcase.main.model.MainState
 import com.udf.showcase.main.model.RefreshMsg
 import com.udf.showcase.main.model.ReposLoadedMsg
 import com.udf.showcase.main.view.IMainView
+import com.udf.showcase.navigation.Navigator
 import io.reactivex.Single
+import org.eclipse.egit.github.core.Repository
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class MainPresenter @Inject constructor(
-    val view: IMainView,
-    programBuilder: ProgramBuilder,
-    private val service: IApiService
+        val view: IMainView,
+        programBuilder: ProgramBuilder,
+        private val service: IApiService,
+        private val navigator: Navigator
 ) : RenderableComponent<MainState> {
 
     private val program: Program<MainState> = programBuilder.build(this)
@@ -38,9 +40,15 @@ class MainPresenter @Inject constructor(
             is Init -> state.copy(isLoading = true) to LoadReposCmd(state.userName)
             is ReposLoadedMsg -> state.copy(isLoading = false, reposList = msg.reposList) to None
             is CancelMsg -> state.copy(isLoading = false) to CancelByClassCmd(cmdClass = LoadReposCmd::class)
-            is RefreshMsg -> state.copy(isLoading = true, reposList = listOf()) to LoadReposCmd(state.userName)
+            is RefreshMsg -> state.copy(isLoading = true, reposList = listOf()) to LoadReposCmd(
+                    state.userName
+            )
             else -> state to None
         }
+    }
+
+    fun render() {
+        program.render()
     }
 
     override fun render(state: MainState) {
@@ -65,8 +73,8 @@ class MainPresenter @Inject constructor(
 
     override fun call(cmd: Cmd): Single<Msg> {
         return when (cmd) {
-            is LoadReposCmd -> service.getStarredRepos(cmd.userName).delay(5,TimeUnit.SECONDS)
-                .map { repos -> ReposLoadedMsg(repos) }
+            is LoadReposCmd -> service.getStarredRepos(cmd.userName)
+                    .map { repos -> ReposLoadedMsg(repos) }
             else -> Single.just(Idle)
         }
     }
@@ -81,6 +89,10 @@ class MainPresenter @Inject constructor(
 
     fun cancel() {
         program.accept(CancelMsg)
+    }
+
+    fun onRepoItemClick(repository: Repository) {
+        navigator.goToRepo(repository)
     }
 
 }
