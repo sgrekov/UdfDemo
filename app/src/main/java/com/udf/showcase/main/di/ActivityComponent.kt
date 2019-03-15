@@ -5,6 +5,8 @@ import com.udf.showcase.login.di.LoginComponent
 import com.udf.showcase.login.di.LoginModule
 import com.udf.showcase.navigation.AndroidNavigator
 import com.udf.showcase.navigation.Navigator
+import com.udf.showcase.repo.di.RepoComponent
+import com.udf.showcase.repo.di.RepoModule
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
@@ -14,6 +16,7 @@ interface ActivityComponent {
 
     fun plusLoginComponent(module: LoginModule): LoginComponent
     fun plusMainComponent(module: MainModule): MainComponent
+    fun plusRepoComponent(module: RepoModule): RepoComponent
 
 }
 
