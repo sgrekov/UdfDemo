@@ -23,6 +23,7 @@ android {
 
 ext {
     support_lib_version = "27.1.1"
+    mobius_version = '1.2.1'
 }
 
 dependencies {
@@ -46,8 +47,10 @@ dependencies {
     implementation 'com.jakewharton:butterknife:8.8.1'
     kapt 'com.jakewharton:butterknife-compiler:8.8.1'
 
-    implementation("com.factorymarket.rxelm:rxelm:0.6.0-SNAPSHOT")
-    testImplementation 'com.factorymarket.rxelm:rxelm-test:0.3.0-SNAPSHOT'
+    implementation "com.spotify.mobius:mobius-core:$mobius_version"
+    implementation "com.spotify.mobius:mobius-rx2:$mobius_version"      // only for RxJava 2 support
+    implementation "com.spotify.mobius:mobius-android:$mobius_version"  // only for Android support
+    implementation "com.spotify.mobius:mobius-extras:$mobius_version"   // utilities for common patterns
 
 
     testImplementation 'junit:junit:4.12'

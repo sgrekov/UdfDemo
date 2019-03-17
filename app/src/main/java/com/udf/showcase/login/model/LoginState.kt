@@ -1,8 +1,6 @@
 package com.udf.showcase.login.model
 
-import com.factorymarket.rxelm.contract.State
-
-data class LoginState(
+data class LoginModel(
     val login: String = "",
     val loginError: String? = null,
     val pass: String = "",
@@ -11,4 +9,4 @@ data class LoginState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val btnEnabled: Boolean = false
-) : State()
+)

@@ -11,32 +11,65 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import butterknife.BindView
+import com.jakewharton.rxbinding2.view.RxView
+import com.spotify.mobius.First.first
+import com.spotify.mobius.MobiusLoop
+import com.spotify.mobius.android.AndroidLogger
+import com.spotify.mobius.android.MobiusAndroid
+import com.spotify.mobius.rx2.RxConnectables
+import com.spotify.mobius.rx2.RxMobius
 import com.udf.showcase.BaseFragment
 import com.udf.showcase.R
-import com.udf.showcase.main.di.MainModule
-import com.udf.showcase.main.presenter.MainPresenter
+import com.udf.showcase.data.IApiService
+import com.udf.showcase.main.model.*
+import com.udf.showcase.navigation.Navigator
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import org.eclipse.egit.github.core.Repository
 import javax.inject.Inject
 
 class MainFragment : BaseFragment(), IMainView {
 
-    @Inject lateinit var presenter: MainPresenter
     @BindView(R.id.repos_list) lateinit var reposList: RecyclerView
     @BindView(R.id.repos_progress) lateinit var progressBar: ProgressBar
     @BindView(R.id.error_text) lateinit var errorText: TextView
     @BindView(R.id.refresh) lateinit var refreshBtn: Button
     @BindView(R.id.cancel) lateinit var cancelBtn: Button
 
+    @Inject lateinit var api: IApiService
+    @Inject lateinit var navigator: Navigator
+
+    var rxEffectHandler = RxMobius.subtypeEffectHandler<MainEffect, MainEvent>()
+        .add(LoadReposEffect::class.java, this::handleLoadRepos)
+        .build()
+
+    lateinit var loopFactory: MobiusLoop.Factory<MainModel, MainEvent, MainEffect>
+    lateinit var controller: MobiusLoop.Controller<MainModel, MainEvent>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         getActivityComponent()
-            .plusMainComponent(MainModule(this))
             .inject(this)
 
-        presenter.init(null)
-    }
+        loopFactory = RxMobius
+            .loop(MainUpdate(), rxEffectHandler)
+            .init {
+                if (it.reposList.isNotEmpty()) {
+                    first(it)
+                } else {
+                    first(MainModel(userName = api.getUserName()), setOf(LoadReposEffect(api.getUserName())))
+                }
+            }
+            .logger(AndroidLogger.tag<MainModel, MainEvent, MainEffect>("my_app"))
 
+        controller = MobiusAndroid.controller(
+            loopFactory,
+            MainModel(userName = api.getUserName())
+        )
+
+    }
 
     override fun getLayoutRes(): Int = R.layout.repos_list_layout
 
@@ -44,20 +77,72 @@ class MainFragment : BaseFragment(), IMainView {
         super.onViewCreated(view, savedInstanceState)
         reposList.layoutManager = LinearLayoutManager(activity)
 
-        refreshBtn.setOnClickListener {
-            presenter.refresh()
-        }
-
-        cancelBtn.setOnClickListener {
-            presenter.cancel()
-        }
-
-        presenter.render()
+        controller.connect(RxConnectables.fromTransformer(this::connectViews))
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.destroy()
+    fun connectViews(models: Observable<MainModel>): Observable<MainEvent> {
+        val disposable = models
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { render(it) }
+
+        val refreshBtnClick = RxView.clicks(refreshBtn)
+            .map { RefreshEvent as MainEvent }
+
+        val cancelBtnClick = RxView.clicks(cancelBtn)
+            .map { CancelEvent as MainEvent }
+
+        return Observable
+            .merge(listOf(refreshBtnClick, cancelBtnClick))
+            .doOnDispose(disposable::dispose)
+    }
+
+    fun render(state: MainModel) {
+        state.apply {
+            setTitle(state.userName + "'s starred repos")
+
+            if (isLoading) {
+                showErrorText(false)
+                if (reposList.isEmpty()) {
+                    showProgress()
+                }
+            } else {
+                hideProgress()
+                if (reposList.isEmpty()) {
+                    setErrorText("User has no starred repos")
+                    showErrorText(true)
+                }
+            }
+            setRepos(reposList)
+        }
+    }
+
+    fun handleLoadRepos(request: Observable<LoadReposEffect>): Observable<MainEvent> {
+        return request.flatMap { effect ->
+            if (effect.cancel) {
+                Single.never<MainEvent>()
+            } else {
+                api.getStarredRepos(effect.userName).map { repos ->
+                    ReposLoadedEvent(
+                        repos
+                    )
+                }
+            }.toObservable()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        controller.start()
+    }
+
+    override fun onPause() {
+        controller.stop()
+        super.onPause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        controller.disconnect()
     }
 
     override fun setTitle(title: String) {
@@ -76,7 +161,7 @@ class MainFragment : BaseFragment(), IMainView {
         this.errorText.text = errorText
     }
 
-    override fun showErrorText(show : Boolean) {
+    override fun showErrorText(show: Boolean) {
         errorText.visibility = if (show) View.VISIBLE else View.GONE
     }
 
@@ -94,7 +179,7 @@ class MainFragment : BaseFragment(), IMainView {
         override fun onBindViewHolder(holder: RepoViewHolder, position: Int) {
             holder.bind(repos[position])
             holder.itemView.setOnClickListener {
-                presenter.onRepoItemClick(repos[position])
+                navigator.goToRepo(repos[position])
             }
         }
 

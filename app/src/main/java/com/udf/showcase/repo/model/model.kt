@@ -1,19 +1,15 @@
 package com.udf.showcase.repo.model
 
-import com.factorymarket.rxelm.cmd.Cmd
-import com.factorymarket.rxelm.contract.State
-import com.factorymarket.rxelm.msg.Msg
 import org.eclipse.egit.github.core.Repository
 
-data class RepoState(
+data class RepoModel(
         val openRepoId: String,
         val repository: Repository? = null,
-        val isLoading: Boolean = false) : State()
+        val isLoading: Boolean = false)
 
-sealed class RepoMsg : Msg()
+sealed class RepoEvent
 
-object InitRepo : RepoMsg()
-data class RepoLoaded(val repo: Repository) : RepoMsg()
+data class RepoLoaded(val repo: Repository) : RepoEvent()
 
-sealed class RepoCmd : Cmd()
-data class LoadRepo(val id: String) : RepoCmd()
+sealed class RepoEffect
+data class LoadRepo(val id: String) : RepoEffect()

@@ -1,19 +1,17 @@
 package com.udf.showcase.main.model
 
-import com.factorymarket.rxelm.cmd.Cmd
-import com.factorymarket.rxelm.contract.State
-import com.factorymarket.rxelm.msg.Msg
 import org.eclipse.egit.github.core.Repository
 
-data class MainState(
+data class MainModel(
     val isLoading: Boolean = true,
     val userName: String,
     val reposList: List<Repository> = listOf()
-) : State()
+)
 
+sealed class MainEffect
+data class LoadReposEffect(val userName: String, val cancel : Boolean = false) : MainEffect()
 
-data class LoadReposCmd(val userName: String) : Cmd()
-
-data class ReposLoadedMsg(val reposList: List<Repository>) : Msg()
-object CancelMsg: Msg()
-object RefreshMsg: Msg()
+sealed class MainEvent
+data class ReposLoadedEvent(val reposList: List<Repository>) : MainEvent()
+object CancelEvent : MainEvent()
+object RefreshEvent : MainEvent()

@@ -9,8 +9,9 @@ import org.eclipse.egit.github.core.client.GitHubClient
 import org.eclipse.egit.github.core.service.RepositoryService
 import org.eclipse.egit.github.core.service.StargazerService
 import org.eclipse.egit.github.core.service.UserService
+import javax.inject.Inject
 
-class GitHubService(private val scheduler: Scheduler) : IApiService {
+class GitHubService @Inject constructor(private val scheduler: Scheduler) : IApiService {
 
     private var client = GitHubClient()
 

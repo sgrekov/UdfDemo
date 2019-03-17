@@ -11,16 +11,28 @@ import android.widget.CheckBox
 import android.widget.ProgressBar
 import android.widget.TextView
 import butterknife.BindView
+import com.jakewharton.rxbinding2.view.RxView
+import com.jakewharton.rxbinding2.widget.RxCompoundButton
+import com.jakewharton.rxbinding2.widget.RxTextView
+import com.spotify.mobius.EventSource
+import com.spotify.mobius.First
+import com.spotify.mobius.MobiusLoop
+import com.spotify.mobius.android.AndroidLogger
+import com.spotify.mobius.android.MobiusAndroid
+import com.spotify.mobius.rx2.RxConnectables
+import com.spotify.mobius.rx2.RxEventSources
+import com.spotify.mobius.rx2.RxMobius
 import com.udf.showcase.BaseFragment
 import com.udf.showcase.R
-import com.udf.showcase.login.di.LoginModule
-import com.udf.showcase.login.presenter.LoginPresenter
-import com.jakewharton.rxbinding2.widget.RxTextView
+import com.udf.showcase.data.IApiService
+import com.udf.showcase.data.IAppPrefs
+import com.udf.showcase.login.model.*
+import com.udf.showcase.navigation.Navigator
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 
 class LoginFragment : BaseFragment(), ILoginView {
-
-    @Inject lateinit var presenter: LoginPresenter
 
     @BindView(R.id.login_til) lateinit var loginInput: TextInputLayout
     @BindView(R.id.login) lateinit var loginText: TextInputEditText
@@ -31,11 +43,38 @@ class LoginFragment : BaseFragment(), ILoginView {
     @BindView(R.id.login_progress) lateinit var loginProgress: ProgressBar
     @BindView(R.id.save_credentials_cb) lateinit var saveCredentialsCb: CheckBox
 
+    @Inject lateinit var prefs: IAppPrefs
+    @Inject lateinit var api: IApiService
+    @Inject lateinit var navigator: Navigator
+
+    var rxEffectHandler =
+        RxMobius.subtypeEffectHandler<LoginEffect, LoginEvent>()
+            .addTransformer(GetSavedUserEffect::class.java, this::handleGetUserSavedCredentials)
+            .addTransformer(SaveUserCredentialsEffect::class.java, this::handleSaveUserSavedCredentials)
+            .addTransformer(LoginRequestEffect::class.java, this::handleLoginRequest)
+            .addAction(GoToMainEffect::class.java, this::handleNavigateToMainScreen, AndroidSchedulers.mainThread())
+            .build()
+
+    val networkObservable: Observable<LoginEvent> = Observable.just(NetworkStateEvent(true))
+
+    val eventSource: EventSource<LoginEvent> = RxEventSources.fromObservables(networkObservable)
+
+    var loopFactory: MobiusLoop.Factory<LoginModel, LoginEvent, LoginEffect> =
+        RxMobius
+            .loop(LoginUpdate(), rxEffectHandler)
+            .init {
+                First.first(LoginModel(), setOf(GetSavedUserEffect))
+            }
+            .eventSource(eventSource)
+            .logger(AndroidLogger.tag<LoginModel, LoginEvent, LoginEffect>("my_app"))
+
+    private val controller: MobiusLoop.Controller<LoginModel, LoginEvent> =
+        MobiusAndroid.controller(loopFactory, LoginModel())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         getActivityComponent()
-            .plusLoginComponent(LoginModule(this))
             .inject(this)
     }
 
@@ -43,21 +82,88 @@ class LoginFragment : BaseFragment(), ILoginView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewDisposables.add(presenter.addLoginInput(RxTextView.textChanges(loginText)))
-        viewDisposables.add(presenter.addPasswordInput(RxTextView.textChanges(passwordText)))
-        loginBtn.setOnClickListener { presenter.loginBtnClick() }
-        saveCredentialsCb.setOnCheckedChangeListener { buttonView, isChecked ->
-            hideKeyboard()
-            presenter.onSaveCredentialsCheck(isChecked)
+
+        controller.connect(RxConnectables.fromTransformer(this::connectViews))
+    }
+
+    fun connectViews(models: Observable<LoginModel>): Observable<LoginEvent> {
+        val disposable = models
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { render(it) }
+
+        val loginBtnClick = RxView.clicks(loginBtn)
+            .map { LoginClickEvent as LoginEvent }
+        val loginText = RxTextView.textChanges(loginText)
+            .map { LoginInputEvent(it.toString()) as LoginEvent }
+        val passText = RxTextView.textChanges(passwordText)
+            .map { PassInputEvent(it.toString()) as LoginEvent }
+        val saveCreds = RxCompoundButton.checkedChanges(saveCredentialsCb)
+            .map { IsSaveCredentialsEvent(it) }
+
+        return Observable
+            .merge(listOf(loginBtnClick, loginText, passText, saveCreds))
+            .doOnDispose(disposable::dispose)
+    }
+
+    fun render(state: LoginModel) {
+        state.apply {
+            setProgress(isLoading)
+            setEnableLoginBtn(btnEnabled)
+            setError(error)
+            showLoginError(loginError)
+            showPasswordError(passError)
         }
-
-        presenter.init()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.destroy()
+    fun handleGetUserSavedCredentials(request: Observable<GetSavedUserEffect>): Observable<LoginEvent> {
+        return prefs.getUserSavedCredentials()
+            .map { (login, pass) ->
+                UserCredentialsLoadedEvent(
+                    login,
+                    pass
+                ) as LoginEvent
+            }
+            .toObservable()
+            .onErrorReturn { return@onErrorReturn UserCredentialsErrorEvent(err = it) }
     }
+
+    fun handleSaveUserSavedCredentials(request: Observable<SaveUserCredentialsEffect>): Observable<LoginEvent> {
+
+        return request.flatMap { effect ->
+            prefs.saveUserSavedCredentials(effect.login, effect.pass)
+                .map { saved -> UserCredentialsSavedEvent }.toObservable()
+        }
+    }
+
+    fun handleLoginRequest(request: Observable<LoginRequestEffect>): Observable<LoginEvent> {
+
+        return request.flatMap { effect ->
+            api.login(effect.login, effect.pass)
+                .map { logged -> LoginResponseEvent(logged) as LoginEvent }
+                .onErrorReturn { LoginResponseErrorEvent(it) }
+                .toObservable()
+        }
+    }
+
+    fun handleNavigateToMainScreen() {
+        navigator.goToMainScreen()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        controller.start()
+    }
+
+    override fun onPause() {
+        controller.stop()
+        super.onPause()
+    }
+
+    override fun onDestroyView() {
+        controller.disconnect()
+        super.onDestroyView()
+    }
+
 
     override fun setProgress(show: Boolean) {
         loginProgress.visibility = if (show) View.VISIBLE else View.GONE
