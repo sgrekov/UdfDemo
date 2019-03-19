@@ -11,6 +11,9 @@ import android.widget.CheckBox
 import android.widget.ProgressBar
 import android.widget.TextView
 import butterknife.BindView
+import com.badoo.mvicore.android.AndroidBindings
+import com.badoo.mvicore.android.lifecycle.CreateDestroyBinderLifecycle
+import com.badoo.mvicore.binder.Binder
 import com.udf.showcase.BaseFragment
 import com.udf.showcase.R
 import com.udf.showcase.login.di.LoginModule
@@ -51,7 +54,10 @@ class LoginFragment : BaseFragment(), ILoginView {
             presenter.onSaveCredentialsCheck(isChecked)
         }
 
-        presenter.init()
+        Binder(CreateDestroyBinderLifecycle(lifecycle)).apply {
+            bind(view to feature using UiEventToWish)
+            bind(feature to view using StateToViewModel)
+        }
     }
 
     override fun onDestroy() {

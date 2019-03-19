@@ -19,6 +19,7 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven { url 'https://jitpack.io' }
         maven { url 'https://repo.eclipse.org/content/groups/releases/' }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
