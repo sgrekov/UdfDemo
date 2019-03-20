@@ -29,7 +29,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import org.eclipse.egit.github.core.Repository
 import javax.inject.Inject
 
-class MainFragment : BaseFragment(), IMainView {
+class MainFragment : BaseFragment() {
 
     @BindView(R.id.repos_list) lateinit var reposList: RecyclerView
     @BindView(R.id.repos_progress) lateinit var progressBar: ProgressBar
@@ -41,7 +41,7 @@ class MainFragment : BaseFragment(), IMainView {
     @Inject lateinit var navigator: Navigator
 
     var rxEffectHandler = RxMobius.subtypeEffectHandler<MainEffect, MainEvent>()
-        .add(LoadReposEffect::class.java, this::handleLoadRepos)
+        .addTransformer(LoadReposEffect::class.java, this::handleLoadRepos)
         .build()
 
     lateinit var loopFactory: MobiusLoop.Factory<MainModel, MainEvent, MainEffect>
@@ -145,27 +145,27 @@ class MainFragment : BaseFragment(), IMainView {
         controller.disconnect()
     }
 
-    override fun setTitle(title: String) {
+    fun setTitle(title: String) {
         (activity as AppCompatActivity).supportActionBar?.title = title
     }
 
-    override fun showProgress() {
+    fun showProgress() {
         progressBar.visibility = View.VISIBLE
     }
 
-    override fun hideProgress() {
+    fun hideProgress() {
         progressBar.visibility = View.GONE
     }
 
-    override fun setErrorText(errorText: String) {
+    fun setErrorText(errorText: String) {
         this.errorText.text = errorText
     }
 
-    override fun showErrorText(show: Boolean) {
+    fun showErrorText(show: Boolean) {
         errorText.visibility = if (show) View.VISIBLE else View.GONE
     }
 
-    override fun setRepos(reposList: List<Repository>) {
+    fun setRepos(reposList: List<Repository>) {
         this.reposList.adapter = ReposAdapter(reposList, layoutInflater)
     }
 

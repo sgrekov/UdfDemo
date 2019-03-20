@@ -17,13 +17,14 @@ import com.udf.showcase.data.GitHubService
 import com.udf.showcase.data.IApiService
 import com.udf.showcase.repo.model.*
 import com.udf.showcase.repo.presenter.RepoUpdate
+import com.udf.showcase.show
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.eclipse.egit.github.core.Repository
 import org.eclipse.egit.github.core.RepositoryId
 import javax.inject.Inject
 
-class RepoFragment : BaseFragment(), IRepoView, Connectable<RepoModel, RepoEvent> {
+class RepoFragment : BaseFragment(), Connectable<RepoModel, RepoEvent> {
 
     companion object {
         const val REPO_ID_KEY = "repo_id_key"
@@ -43,7 +44,7 @@ class RepoFragment : BaseFragment(), IRepoView, Connectable<RepoModel, RepoEvent
     lateinit var loopFactory: MobiusLoop.Factory<RepoModel, RepoEvent, RepoEffect>
     lateinit var controller: MobiusLoop.Controller<RepoModel, RepoEvent>
 
-    lateinit var initialModel : RepoModel
+    lateinit var initialModel: RepoModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,7 +84,7 @@ class RepoFragment : BaseFragment(), IRepoView, Connectable<RepoModel, RepoEvent
 
     fun render(model: RepoModel) {
         showLoading(model.isLoading)
-        model.repository?.let { showRepo(it) }
+        showRepo(model.repository)
     }
 
     override fun getLayoutRes(): Int = R.layout.repo_layout
@@ -112,22 +113,24 @@ class RepoFragment : BaseFragment(), IRepoView, Connectable<RepoModel, RepoEvent
     }
 
 
-    override fun showLoading(loading: Boolean) {
-        tvRepoName.visibility = View.GONE
-        tvRepoDescr.visibility = View.GONE
-        tvRepoOwner.visibility = View.GONE
-        pbLoading.visibility = View.VISIBLE
+    fun showLoading(loading: Boolean) {
+        pbLoading.show(loading)
     }
 
-    override fun showRepo(repo: Repository) {
-        tvRepoName.visibility = View.VISIBLE
-        tvRepoDescr.visibility = View.VISIBLE
-        tvRepoOwner.visibility = View.VISIBLE
-        pbLoading.visibility = View.GONE
+    fun showRepo(repo: Repository?) {
+        repo?.let {
+            tvRepoName.show()
+            tvRepoDescr.show()
+            tvRepoOwner.show()
 
-        tvRepoName.text = repo.name
-        tvRepoDescr.text = repo.description
-        tvRepoOwner.text = repo.owner.login
+            tvRepoName.text = repo.name
+            tvRepoDescr.text = repo.description
+            tvRepoOwner.text = repo.owner.login
+        } ?: run {
+            tvRepoName.show(false)
+            tvRepoDescr.show(false)
+            tvRepoOwner.show(false)
+        }
     }
 
 }

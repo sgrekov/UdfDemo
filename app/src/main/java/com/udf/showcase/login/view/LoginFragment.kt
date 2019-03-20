@@ -32,7 +32,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 
-class LoginFragment : BaseFragment(), ILoginView {
+class LoginFragment : BaseFragment() {
 
     @BindView(R.id.login_til) lateinit var loginInput: TextInputLayout
     @BindView(R.id.login) lateinit var loginText: TextInputEditText
@@ -165,11 +165,11 @@ class LoginFragment : BaseFragment(), ILoginView {
     }
 
 
-    override fun setProgress(show: Boolean) {
+    fun setProgress(show: Boolean) {
         loginProgress.visibility = if (show) View.VISIBLE else View.GONE
     }
 
-    override fun showPasswordError(errorText: String?) {
+    fun showPasswordError(errorText: String?) {
         errorText?.let {
             passwordInput.error = errorText
         } ?: run {
@@ -177,7 +177,7 @@ class LoginFragment : BaseFragment(), ILoginView {
         }
     }
 
-    override fun showLoginError(errorText: String?) {
+    fun showLoginError(errorText: String?) {
         errorText?.let {
             loginInput.error = errorText
         } ?: run {
@@ -185,7 +185,7 @@ class LoginFragment : BaseFragment(), ILoginView {
         }
     }
 
-    override fun setError(error: String?) {
+    fun setError(error: String?) {
         error?.let {
             errorTxt.visibility = View.VISIBLE
             errorTxt.text = error
@@ -194,13 +194,13 @@ class LoginFragment : BaseFragment(), ILoginView {
         }
     }
 
-    override fun hideKeyboard() {
+    fun hideKeyboard() {
         val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
 
         imm?.hideSoftInputFromWindow(loginText.windowToken, 0)
     }
 
-    override fun setEnableLoginBtn(enabled: Boolean) {
+    fun setEnableLoginBtn(enabled: Boolean) {
         loginBtn.isEnabled = enabled
     }
 
