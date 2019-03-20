@@ -1,6 +1,10 @@
 package com.udf.showcase
 
 import android.app.Application
+import com.badoo.mvicore.consumer.middleware.LoggingMiddleware
+import com.badoo.mvicore.consumer.middlewareconfig.MiddlewareConfiguration
+import com.badoo.mvicore.consumer.middlewareconfig.Middlewares
+import com.badoo.mvicore.consumer.middlewareconfig.WrappingCondition
 import com.udf.showcase.data.GitHubService
 import com.udf.showcase.di.AppComponent
 import com.udf.showcase.di.DaggerAppComponent
@@ -28,5 +32,14 @@ class SampleApp : Application() {
             .build()
 
         Timber.plant(Timber.DebugTree())
+
+        Middlewares.configurations.add(
+            MiddlewareConfiguration(
+                condition = WrappingCondition.Always,
+                factories = listOf(
+                    { consumer -> LoggingMiddleware(consumer, { Timber.d(it) }) }
+                )
+            )
+        )
     }
 }

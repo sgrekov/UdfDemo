@@ -6,24 +6,37 @@ import android.support.design.widget.TextInputEditText
 import android.support.design.widget.TextInputLayout
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import butterknife.BindView
-import com.badoo.mvicore.android.AndroidBindings
-import com.badoo.mvicore.android.lifecycle.CreateDestroyBinderLifecycle
+import com.badoo.mvicore.android.AndroidBinderLifecycle
 import com.badoo.mvicore.binder.Binder
+import com.badoo.mvicore.binder.using
+import com.jakewharton.rxbinding2.widget.RxTextView
 import com.udf.showcase.BaseFragment
 import com.udf.showcase.R
-import com.udf.showcase.login.di.LoginModule
-import com.udf.showcase.login.presenter.LoginPresenter
-import com.jakewharton.rxbinding2.widget.RxTextView
+import com.udf.showcase.login.model.LoginUiEvent
+import com.udf.showcase.login.model.LoginUiEventToWish
+import com.udf.showcase.login.presenter.LoginFeature
+import com.udf.showcase.navigation.Navigator
+import io.reactivex.functions.Consumer
+import timber.log.Timber
 import javax.inject.Inject
 
-class LoginFragment : BaseFragment(), ILoginView {
+class LoginFragment : BaseFragment<LoginUiEvent>(), Consumer<LoginFeature.LoginState> {
 
-    @Inject lateinit var presenter: LoginPresenter
+    val newsListener = Consumer<LoginFeature.News> { n ->
+        n?.let { news ->
+            when (news) {
+                is LoginFeature.News.AuthError -> {
+                    Toast.makeText(context, news.throwable.message, Toast.LENGTH_SHORT).show()
+                }
+                is LoginFeature.News.GoToMainScreen -> navigator.goToMainScreen()
+            }
+        }
+    }
+
+    @Inject lateinit var loginFeature: LoginFeature
+    @Inject lateinit var navigator: Navigator
 
     @BindView(R.id.login_til) lateinit var loginInput: TextInputLayout
     @BindView(R.id.login) lateinit var loginText: TextInputEditText
@@ -38,7 +51,6 @@ class LoginFragment : BaseFragment(), ILoginView {
         super.onCreate(savedInstanceState)
 
         getActivityComponent()
-            .plusLoginComponent(LoginModule(this))
             .inject(this)
     }
 
@@ -46,30 +58,40 @@ class LoginFragment : BaseFragment(), ILoginView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewDisposables.add(presenter.addLoginInput(RxTextView.textChanges(loginText)))
-        viewDisposables.add(presenter.addPasswordInput(RxTextView.textChanges(passwordText)))
-        loginBtn.setOnClickListener { presenter.loginBtnClick() }
+        viewDisposables.add(
+            RxTextView.textChanges(loginText).doOnNext { onNext(LoginUiEvent.LoginEvent(it.toString())) }.subscribe()
+        )
+        viewDisposables.add(
+            RxTextView.textChanges(passwordText).doOnNext { onNext(LoginUiEvent.PassEvent(it.toString())) }.subscribe()
+        )
+        loginBtn.setOnClickListener { onNext(LoginUiEvent.LoginClickEvent) }
         saveCredentialsCb.setOnCheckedChangeListener { buttonView, isChecked ->
             hideKeyboard()
-            presenter.onSaveCredentialsCheck(isChecked)
+            onNext(LoginUiEvent.SaveLoginCheckBoxEvent(isChecked))
         }
 
-        Binder(CreateDestroyBinderLifecycle(lifecycle)).apply {
-            bind(view to feature using UiEventToWish)
-            bind(feature to view using StateToViewModel)
+        val binder = Binder(AndroidBinderLifecycle(lifecycle))
+        binder.bind(this to loginFeature using LoginUiEventToWish())
+        binder.bind(loginFeature to this)
+        binder.bind(loginFeature.news to newsListener)
+    }
+
+    override fun accept(state: LoginFeature.LoginState?) {
+        state?.let {
+            Timber.d("login state: $state")
+            setProgress(it.isLoading)
+            setEnableLoginBtn(it.btnEnabled)
+            setError(it.error)
+            showLoginError(it.loginError)
+            showPasswordError(it.passError)
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.destroy()
-    }
-
-    override fun setProgress(show: Boolean) {
+    fun setProgress(show: Boolean) {
         loginProgress.visibility = if (show) View.VISIBLE else View.GONE
     }
 
-    override fun showPasswordError(errorText: String?) {
+    fun showPasswordError(errorText: String?) {
         errorText?.let {
             passwordInput.error = errorText
         } ?: run {
@@ -77,7 +99,7 @@ class LoginFragment : BaseFragment(), ILoginView {
         }
     }
 
-    override fun showLoginError(errorText: String?) {
+    fun showLoginError(errorText: String?) {
         errorText?.let {
             loginInput.error = errorText
         } ?: run {
@@ -85,7 +107,7 @@ class LoginFragment : BaseFragment(), ILoginView {
         }
     }
 
-    override fun setError(error: String?) {
+    fun setError(error: String?) {
         error?.let {
             errorTxt.visibility = View.VISIBLE
             errorTxt.text = error
@@ -94,13 +116,13 @@ class LoginFragment : BaseFragment(), ILoginView {
         }
     }
 
-    override fun hideKeyboard() {
+    fun hideKeyboard() {
         val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
 
         imm?.hideSoftInputFromWindow(loginText.windowToken, 0)
     }
 
-    override fun setEnableLoginBtn(enabled: Boolean) {
+    fun setEnableLoginBtn(enabled: Boolean) {
         loginBtn.isEnabled = enabled
     }
 

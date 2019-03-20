@@ -1,7 +1,5 @@
 package com.udf.showcase.main.di
 
-import com.udf.showcase.login.view.ILoginView
-import com.udf.showcase.login.view.LoginFragment
 import com.udf.showcase.main.view.IMainView
 import com.udf.showcase.main.view.MainFragment
 import dagger.Module

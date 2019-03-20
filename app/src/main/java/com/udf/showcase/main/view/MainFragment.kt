@@ -14,11 +14,12 @@ import butterknife.BindView
 import com.udf.showcase.BaseFragment
 import com.udf.showcase.R
 import com.udf.showcase.main.di.MainModule
+import com.udf.showcase.main.model.MainState
 import com.udf.showcase.main.presenter.MainPresenter
 import org.eclipse.egit.github.core.Repository
 import javax.inject.Inject
 
-class MainFragment : BaseFragment(), IMainView {
+class MainFragment : BaseFragment<MainState>(), IMainView {
 
     @Inject lateinit var presenter: MainPresenter
     @BindView(R.id.repos_list) lateinit var reposList: RecyclerView
@@ -44,20 +45,20 @@ class MainFragment : BaseFragment(), IMainView {
         super.onViewCreated(view, savedInstanceState)
         reposList.layoutManager = LinearLayoutManager(activity)
 
-        refreshBtn.setOnClickListener {
-            presenter.refresh()
-        }
-
-        cancelBtn.setOnClickListener {
-            presenter.cancel()
-        }
-
-        presenter.render()
+//        refreshBtn.setOnClickListener {
+//            presenter.refresh()
+//        }
+//
+//        cancelBtn.setOnClickListener {
+//            presenter.cancel()
+//        }
+//
+//        presenter.render()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        presenter.destroy()
+//        presenter.destroy()
     }
 
     override fun setTitle(title: String) {

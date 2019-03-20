@@ -9,12 +9,25 @@ import butterknife.ButterKnife
 import butterknife.Unbinder
 import com.udf.showcase.main.di.ActivityComponent
 import com.udf.showcase.main.view.MainActivity
+import io.reactivex.ObservableSource
+import io.reactivex.Observer
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
 
-abstract class BaseFragment : Fragment() {
+abstract class BaseFragment<T> : Fragment(), ObservableSource<T> {
 
     lateinit var unbinder: Unbinder
     var viewDisposables: CompositeDisposable = CompositeDisposable()
+
+    private val source = PublishSubject.create<T>()
+
+    protected fun onNext(t: T) {
+        source.onNext(t)
+    }
+
+    override fun subscribe(observer: Observer<in T>) {
+        source.subscribe(observer)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

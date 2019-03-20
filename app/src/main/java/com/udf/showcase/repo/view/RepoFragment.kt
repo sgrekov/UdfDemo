@@ -9,11 +9,12 @@ import butterknife.BindView
 import com.udf.showcase.BaseFragment
 import com.udf.showcase.R
 import com.udf.showcase.repo.di.RepoModule
+import com.udf.showcase.repo.model.RepoState
 import com.udf.showcase.repo.presenter.RepoPresenter
 import org.eclipse.egit.github.core.Repository
 import javax.inject.Inject
 
-class RepoFragment : BaseFragment(), IRepoView {
+class RepoFragment : BaseFragment<RepoState>(), IRepoView {
 
     companion object {
         const val REPO_ID_KEY = "repo_id_key"
@@ -56,11 +57,6 @@ class RepoFragment : BaseFragment(), IRepoView {
         tvRepoName.text = repo.name
         tvRepoDescr.text = repo.description
         tvRepoOwner.text = repo.owner.login
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.destroy()
     }
 
 }
