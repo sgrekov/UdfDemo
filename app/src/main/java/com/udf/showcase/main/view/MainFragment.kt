@@ -11,31 +11,36 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import butterknife.BindView
+import com.badoo.mvicore.android.AndroidBinderLifecycle
+import com.badoo.mvicore.binder.Binder
+import com.badoo.mvicore.binder.using
 import com.udf.showcase.BaseFragment
 import com.udf.showcase.R
-import com.udf.showcase.main.di.MainModule
-import com.udf.showcase.main.model.MainState
-import com.udf.showcase.main.presenter.MainPresenter
+import com.udf.showcase.main.model.RepoListUiEvents
+import com.udf.showcase.main.model.RepoListUiEventsToWish
+import com.udf.showcase.main.presenter.RepoListFeature
+import com.udf.showcase.navigation.Navigator
+import io.reactivex.functions.Consumer
 import org.eclipse.egit.github.core.Repository
 import javax.inject.Inject
 
-class MainFragment : BaseFragment<MainState>(), IMainView {
+class MainFragment : BaseFragment<RepoListUiEvents>(), Consumer<RepoListFeature.RepoListState> {
 
-    @Inject lateinit var presenter: MainPresenter
+
     @BindView(R.id.repos_list) lateinit var reposList: RecyclerView
     @BindView(R.id.repos_progress) lateinit var progressBar: ProgressBar
     @BindView(R.id.error_text) lateinit var errorText: TextView
     @BindView(R.id.refresh) lateinit var refreshBtn: Button
     @BindView(R.id.cancel) lateinit var cancelBtn: Button
 
+    @Inject lateinit var repoListFeature: RepoListFeature
+    @Inject lateinit var navigator: Navigator
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         getActivityComponent()
-            .plusMainComponent(MainModule(this))
             .inject(this)
-
-        presenter.init(null)
     }
 
 
@@ -45,43 +50,66 @@ class MainFragment : BaseFragment<MainState>(), IMainView {
         super.onViewCreated(view, savedInstanceState)
         reposList.layoutManager = LinearLayoutManager(activity)
 
-//        refreshBtn.setOnClickListener {
-//            presenter.refresh()
-//        }
-//
-//        cancelBtn.setOnClickListener {
-//            presenter.cancel()
-//        }
-//
-//        presenter.render()
+        refreshBtn.setOnClickListener {
+            onNext(RepoListUiEvents.Refresh)
+        }
+
+        cancelBtn.setOnClickListener {
+            onNext(RepoListUiEvents.Cancel)
+        }
+
+        val binder = Binder(AndroidBinderLifecycle(lifecycle))
+        binder.bind(this to repoListFeature using RepoListUiEventsToWish())
+        binder.bind(repoListFeature to this)
+
+    }
+
+    override fun accept(state: RepoListFeature.RepoListState?) {
+        state?.apply {
+            setTitle(state.userName + "'s starred repos")
+
+            if (isLoading) {
+                showErrorText(false)
+                if (reposList.isEmpty()) {
+                    showProgress()
+                }
+            } else {
+                hideProgress()
+                if (reposList.isEmpty()) {
+                    setErrorText("User has no starred repos")
+                    showErrorText(true)
+                }
+            }
+            setRepos(reposList)
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-//        presenter.destroy()
+        repoListFeature.dispose()
     }
 
-    override fun setTitle(title: String) {
+    fun setTitle(title: String) {
         (activity as AppCompatActivity).supportActionBar?.title = title
     }
 
-    override fun showProgress() {
+    fun showProgress() {
         progressBar.visibility = View.VISIBLE
     }
 
-    override fun hideProgress() {
+    fun hideProgress() {
         progressBar.visibility = View.GONE
     }
 
-    override fun setErrorText(errorText: String) {
+    fun setErrorText(errorText: String) {
         this.errorText.text = errorText
     }
 
-    override fun showErrorText(show : Boolean) {
+    fun showErrorText(show: Boolean) {
         errorText.visibility = if (show) View.VISIBLE else View.GONE
     }
 
-    override fun setRepos(reposList: List<Repository>) {
+    fun setRepos(reposList: List<Repository>) {
         this.reposList.adapter = ReposAdapter(reposList, layoutInflater)
     }
 
@@ -95,7 +123,7 @@ class MainFragment : BaseFragment<MainState>(), IMainView {
         override fun onBindViewHolder(holder: RepoViewHolder, position: Int) {
             holder.bind(repos[position])
             holder.itemView.setOnClickListener {
-                presenter.onRepoItemClick(repos[position])
+                navigator.goToRepo(repos[position])
             }
         }
 

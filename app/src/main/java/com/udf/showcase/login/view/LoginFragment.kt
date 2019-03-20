@@ -87,6 +87,11 @@ class LoginFragment : BaseFragment<LoginUiEvent>(), Consumer<LoginFeature.LoginS
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        loginFeature.dispose()
+    }
+
     fun setProgress(show: Boolean) {
         loginProgress.visibility = if (show) View.VISIBLE else View.GONE
     }
