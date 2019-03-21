@@ -55,18 +55,16 @@ class RepoFragment : BaseFragment<Unit>(), Consumer<RepoFeature.RepoState> {
     }
 
     fun showRepo(repo: Repository?) {
-        repo?.let {
-            tvRepoName.show()
-            tvRepoDescr.show()
-            tvRepoOwner.show()
+        val exists = repo != null
 
+        tvRepoName.show(exists)
+        tvRepoDescr.show(exists)
+        tvRepoOwner.show(exists)
+
+        repo?.let {
             tvRepoName.text = repo.name
             tvRepoDescr.text = repo.description
             tvRepoOwner.text = repo.owner.login
-        } ?: run {
-            tvRepoName.show(false)
-            tvRepoDescr.show(false)
-            tvRepoOwner.show(false)
         }
     }
 
