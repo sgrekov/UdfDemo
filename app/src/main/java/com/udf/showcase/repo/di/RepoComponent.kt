@@ -1,6 +1,5 @@
 package com.udf.showcase.repo.di
 
-import com.udf.showcase.repo.view.IRepoView
 import com.udf.showcase.repo.view.RepoFragment
 import dagger.Module
 import dagger.Provides
@@ -16,10 +15,7 @@ interface RepoComponent {
 }
 
 @Module
-class RepoModule(private val fragment: RepoFragment, private val repoId: String) {
-
-    @Provides
-    fun view(): IRepoView = fragment
+class RepoModule(private val repoId: String) {
 
     @Provides
     @Named("repo_id")

@@ -59,7 +59,6 @@ class RepoListFeature @Inject constructor(
             is RepoListEffect.ReposLoaded -> state.copy(isLoading = false, reposList = effect.reposList)
             RepoListEffect.StartLoad -> state.copy(isLoading = true, reposList = listOf())
         }
-
     }
 
 }
