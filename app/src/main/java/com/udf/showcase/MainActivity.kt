@@ -1,4 +1,4 @@
-package com.udf.showcase.repolist.view
+package com.udf.showcase
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

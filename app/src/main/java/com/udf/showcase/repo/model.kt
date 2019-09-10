@@ -1,4 +1,4 @@
-package com.udf.showcase.repo.model
+package com.udf.showcase.repo
 
 import com.factorymarket.rxelm.cmd.Cmd
 import com.factorymarket.rxelm.contract.State
@@ -11,8 +11,6 @@ data class RepoState(
         val isLoading: Boolean = false) : State()
 
 sealed class RepoMsg : Msg()
-
-object InitRepo : RepoMsg()
 data class RepoLoaded(val repo: Repository) : RepoMsg()
 
 sealed class RepoCmd : Cmd()

@@ -1,10 +1,12 @@
-package com.udf.showcase.repolist.view
+package com.udf.showcase.repolist
 
 import android.content.Context
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.udf.showcase.BaseRenderable
-import com.udf.showcase.TypedRenderableAdapter
-import com.udf.showcase.repolist.RepoListState
+import com.udf.showcase.core.BaseRenderable
+import com.udf.showcase.core.TypedRenderableAdapter
+import com.udf.showcase.column
+import com.udf.showcase.marginTop
+import com.udf.showcase.toolbarWidget
 import org.eclipse.egit.github.core.Repository
 import timber.log.Timber
 import trikita.anvil.BaseDSL
@@ -19,42 +21,47 @@ class RepoListRenderable(context: Context) : BaseRenderable<RepoListState>(conte
     private var reposAdapter = createAdapter(listOf())
 
     override fun view() {
-        frameLayout {
+        column {
             size(MATCH, MATCH)
-            padding(dip(10))
-            textView {
-                size(WRAP, WRAP)
-                layoutGravity(CENTER)
-                visibility(model.reposList.isEmpty() && !model.isLoading)
-                BaseDSL.text("User has no starred repos")
-            }
-            progressBar {
-                size(WRAP, WRAP)
-                layoutGravity(CENTER)
-                visibility(model.isLoading)
-            }
-
-            MaterialDSL.materialButton {
-                size(WRAP, WRAP)
-                BaseDSL.text("Refresh")
-                layoutGravity(START or TOP)
-                onClick {
-                    repoListClickListener.refresh()
-                }
-            }
-            MaterialDSL.materialButton {
-                size(WRAP, WRAP)
-                BaseDSL.text("Cancel")
-                layoutGravity(END or TOP)
-                onClick { repoListClickListener.cancel() }
-            }
-            RecyclerViewv7DSL.recyclerView {
+            toolbarWidget("Your starred repositories")
+            frameLayout {
                 size(MATCH, MATCH)
-                padding(dip(4))
-                visibility(model.reposList.isNotEmpty())
-                RecyclerViewv7DSL.linearLayoutManager(LinearLayoutManager.VERTICAL)
-                init {
-                    RecyclerViewv7DSL.adapter(reposAdapter)
+                padding(dip(10))
+                textView {
+                    size(WRAP, WRAP)
+                    layoutGravity(CENTER)
+                    visibility(model.reposList.isEmpty() && !model.isLoading)
+                    BaseDSL.text("User has no starred repos")
+                }
+                progressBar {
+                    size(WRAP, WRAP)
+                    layoutGravity(CENTER)
+                    visibility(model.isLoading)
+                }
+
+                MaterialDSL.materialButton {
+                    size(WRAP, dip(50))
+                    BaseDSL.text("Refresh")
+                    layoutGravity(START or TOP)
+                    onClick {
+                        repoListClickListener.refresh()
+                    }
+                }
+                MaterialDSL.materialButton {
+                    size(WRAP, dip(50))
+                    BaseDSL.text("Cancel")
+                    layoutGravity(END or TOP)
+                    onClick { repoListClickListener.cancel() }
+                }
+                RecyclerViewv7DSL.recyclerView {
+                    size(MATCH, MATCH)
+                    marginTop(dip(50))
+                    padding(dip(4))
+                    visibility(model.reposList.isNotEmpty())
+                    RecyclerViewv7DSL.linearLayoutManager(LinearLayoutManager.VERTICAL)
+                    init {
+                        RecyclerViewv7DSL.adapter(reposAdapter)
+                    }
                 }
             }
         }

@@ -1,4 +1,4 @@
-package com.udf.showcase
+package com.udf.showcase.core
 
 import android.content.Context
 import android.os.Bundle
@@ -6,20 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import butterknife.Unbinder
 import com.factorymarket.rxelm.contract.RenderableComponent
 import com.factorymarket.rxelm.contract.State
 import com.factorymarket.rxelm.program.Program
 import com.factorymarket.rxelm.program.ProgramBuilder
+import com.udf.showcase.MainActivity
 import com.udf.showcase.di.ActivityComponent
-import com.udf.showcase.repolist.view.MainActivity
-import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
-abstract class BaseFragment2<S : State> : Fragment(), RenderableComponent<S> {
-
-    lateinit var unbinder: Unbinder
-    var viewDisposables: CompositeDisposable = CompositeDisposable()
+abstract class BaseFragment<S : State> : Fragment(), RenderableComponent<S> {
 
     @Inject lateinit var programBuilder: ProgramBuilder
     lateinit var program: Program<S>
@@ -55,15 +50,6 @@ abstract class BaseFragment2<S : State> : Fragment(), RenderableComponent<S> {
     abstract fun setupDI()
 
     abstract fun initialState(): S
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        if (!viewDisposables.isDisposed) {
-            viewDisposables.dispose()
-            viewDisposables = CompositeDisposable()
-        }
-//        unbinder.unbind()
-    }
 
     fun getActivityComponent(): ActivityComponent {
         return (activity as? MainActivity)?.activityComponent!!

@@ -5,9 +5,9 @@ import androidx.fragment.app.FragmentActivity
 import com.udf.showcase.MAIN_TAG
 import com.udf.showcase.R
 import com.udf.showcase.REPO_TAG
-import com.udf.showcase.repolist.view.RepoListFragment
-import com.udf.showcase.repo.view.RepoFragment
-import com.udf.showcase.repo.view.RepoFragment.Companion.REPO_ID_KEY
+import com.udf.showcase.repolist.RepoListFragment
+import com.udf.showcase.repo.RepoFragment
+import com.udf.showcase.repo.RepoFragment.Companion.REPO_ID_KEY
 import org.eclipse.egit.github.core.Repository
 
 

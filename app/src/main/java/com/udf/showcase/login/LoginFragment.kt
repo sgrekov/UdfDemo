@@ -3,8 +3,8 @@ package com.udf.showcase.login
 import android.content.Context
 import com.factorymarket.rxelm.cmd.Cmd
 import com.factorymarket.rxelm.msg.Msg
-import com.udf.showcase.BaseFragment2
-import com.udf.showcase.BaseRenderable
+import com.udf.showcase.core.BaseFragment
+import com.udf.showcase.core.BaseRenderable
 import com.udf.showcase.data.IApiService
 import com.udf.showcase.data.IAppPrefs
 import com.udf.showcase.inView
@@ -13,7 +13,7 @@ import com.udf.showcase.noEffect
 import io.reactivex.Single
 import javax.inject.Inject
 
-class LoginFragment : BaseFragment2<LoginState>(), LoginClickListener {
+class LoginFragment : BaseFragment<LoginState>(), LoginClickListener {
 
     @Inject lateinit var appPrefs: IAppPrefs
     @Inject lateinit var apiService: IApiService

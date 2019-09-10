@@ -1,24 +1,19 @@
-package com.udf.showcase.repolist.view
+package com.udf.showcase.repolist
 
 import android.content.Context
 import com.factorymarket.rxelm.cmd.Cmd
 import com.factorymarket.rxelm.msg.Msg
-import com.udf.showcase.BaseFragment2
-import com.udf.showcase.BaseRenderable
+import com.udf.showcase.core.BaseFragment
+import com.udf.showcase.core.BaseRenderable
 import com.udf.showcase.data.IApiService
-import com.udf.showcase.repolist.CancelMsg
-import com.udf.showcase.repolist.LoadReposCmd
-import com.udf.showcase.repolist.RepoListState
-import com.udf.showcase.repolist.RefreshMsg
-import com.udf.showcase.repolist.ReposLoadedMsg
-import com.udf.showcase.repolist.repoListUpdate
 import com.udf.showcase.navigation.Navigator
 import com.udf.showcase.noEffect
 import io.reactivex.Single
 import org.eclipse.egit.github.core.Repository
 import javax.inject.Inject
 
-class RepoListFragment : BaseFragment2<RepoListState>(), RepoListClickListener {
+class RepoListFragment : BaseFragment<RepoListState>(),
+    RepoListClickListener {
 
     @Inject lateinit var service: IApiService
     @Inject lateinit var navigator: Navigator

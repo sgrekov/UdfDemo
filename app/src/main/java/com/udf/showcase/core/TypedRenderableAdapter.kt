@@ -1,4 +1,4 @@
-package com.udf.showcase
+package com.udf.showcase.core
 
 import android.view.ViewGroup
 import android.widget.FrameLayout
