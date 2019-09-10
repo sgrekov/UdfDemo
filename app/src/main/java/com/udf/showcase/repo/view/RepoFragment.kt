@@ -1,7 +1,6 @@
 package com.udf.showcase.repo.view
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -33,7 +32,7 @@ class RepoFragment : BaseFragment(), IRepoView {
                 .inject(this)
     }
 
-    override fun getLayoutRes(): Int = R.layout.repo_layout
+    fun getLayoutRes(): Int = R.layout.repo_layout
 
     override fun onResume() {
         super.onResume()

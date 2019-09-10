@@ -1,6 +1,5 @@
 package com.udf.showcase.di
 
-import android.app.Application
 import android.content.Context
 import com.factorymarket.rxelm.log.LogType
 import com.factorymarket.rxelm.log.RxElmLogger
@@ -10,12 +9,6 @@ import com.udf.showcase.data.AppPrefs
 import com.udf.showcase.data.GitHubService
 import com.udf.showcase.data.IApiService
 import com.udf.showcase.data.IAppPrefs
-import com.udf.showcase.login.di.LoginComponent
-import com.udf.showcase.login.di.LoginModule
-import com.udf.showcase.main.di.ActivityComponent
-import com.udf.showcase.main.di.ActivityModule
-import com.udf.showcase.main.di.MainComponent
-import com.udf.showcase.main.di.MainModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module

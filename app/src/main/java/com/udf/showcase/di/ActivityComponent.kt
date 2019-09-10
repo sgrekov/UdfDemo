@@ -1,8 +1,8 @@
-package com.udf.showcase.main.di
+package com.udf.showcase.di
 
-import android.support.v4.app.FragmentActivity
-import com.udf.showcase.login.di.LoginComponent
-import com.udf.showcase.login.di.LoginModule
+import androidx.fragment.app.FragmentActivity
+import com.udf.showcase.login.LoginFragment
+import com.udf.showcase.repolist.view.RepoListFragment
 import com.udf.showcase.navigation.AndroidNavigator
 import com.udf.showcase.navigation.Navigator
 import com.udf.showcase.repo.di.RepoComponent
@@ -14,9 +14,9 @@ import dagger.Subcomponent
 @Subcomponent(modules = [ActivityModule::class])
 interface ActivityComponent {
 
-    fun plusLoginComponent(module: LoginModule): LoginComponent
-    fun plusMainComponent(module: MainModule): MainComponent
     fun plusRepoComponent(module: RepoModule): RepoComponent
+    fun inject(loginFragment: LoginFragment)
+    fun inject(repoListFragment: RepoListFragment)
 
 }
 

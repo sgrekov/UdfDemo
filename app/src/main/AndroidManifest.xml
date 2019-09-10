@@ -15,7 +15,7 @@
         android:supportsRtl="true"
 
         android:theme="@style/AppTheme">
-        <activity android:name=".main.view.MainActivity">
+        <activity android:name=".repolist.view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

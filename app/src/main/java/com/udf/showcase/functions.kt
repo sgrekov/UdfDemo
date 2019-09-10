@@ -10,3 +10,5 @@ inline fun inView(crossinline operations: () -> Unit): Single<Msg> {
         operations()
     }.subscribeOn(AndroidSchedulers.mainThread()).map { Idle }
 }
+
+fun noEffect(): Single<Msg> = Single.just(Idle)

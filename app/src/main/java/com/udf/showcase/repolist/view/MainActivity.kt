@@ -1,14 +1,14 @@
-package com.udf.showcase.main.view
+package com.udf.showcase.repolist.view
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.udf.showcase.LOGIN_TAG
 import com.udf.showcase.MAIN_TAG
 import com.udf.showcase.R
 import com.udf.showcase.SampleApp
-import com.udf.showcase.login.view.LoginFragment
-import com.udf.showcase.main.di.ActivityComponent
-import com.udf.showcase.main.di.ActivityModule
+import com.udf.showcase.login.LoginFragment
+import com.udf.showcase.di.ActivityComponent
+import com.udf.showcase.di.ActivityModule
 
 class MainActivity : AppCompatActivity() {
 
