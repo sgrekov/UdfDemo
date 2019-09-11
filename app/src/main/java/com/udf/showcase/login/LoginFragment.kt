@@ -31,8 +31,7 @@ class LoginFragment : BaseFragment<LoginState>(), LoginClickListener {
         return renderable
     }
 
-    override fun initialState(): LoginState =
-        LoginState()
+    override fun initialState(): LoginState = LoginState()
 
     override fun update(msg: Msg, state: LoginState): Update<LoginState> {
         return loginUpdate(msg, state)
