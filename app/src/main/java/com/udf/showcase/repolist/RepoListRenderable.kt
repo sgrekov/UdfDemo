@@ -2,11 +2,14 @@ package com.udf.showcase.repolist
 
 import android.content.Context
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.udf.showcase.box
 import com.udf.showcase.core.BaseRenderable
 import com.udf.showcase.core.TypedRenderableAdapter
 import com.udf.showcase.column
 import com.udf.showcase.marginTop
+import com.udf.showcase.textWrapped
 import com.udf.showcase.toolbarWidget
+import com.udf.showcase.R
 import org.eclipse.egit.github.core.Repository
 import trikita.anvil.BaseDSL
 import trikita.anvil.DSL.*
@@ -23,14 +26,11 @@ class RepoListRenderable(context: Context) : BaseRenderable<RepoListState>(conte
         column {
             size(MATCH, MATCH)
             toolbarWidget("Your starred repositories")
-            frameLayout {
-                size(MATCH, MATCH)
+            box {
                 padding(dip(10))
-                textView {
-                    size(WRAP, WRAP)
+                textWrapped(R.string.no_repos){
                     layoutGravity(CENTER)
                     visibility(model.reposList.isEmpty() && !model.isLoading)
-                    BaseDSL.text("User has no starred repos")
                 }
                 progressBar {
                     size(WRAP, WRAP)
@@ -87,15 +87,11 @@ class RepoListRenderable(context: Context) : BaseRenderable<RepoListState>(conte
     private fun repoListItem(item: Repository, r: (Repository) -> Unit) {
         frameLayout {
             size(MATCH, dip(50))
-            textView {
-                size(WRAP, WRAP)
+            textWrapped(item.name){
                 layoutGravity(START or BaseDSL.CENTER_VERTICAL)
-                text(item.name)
             }
-            textView {
-                size(WRAP, WRAP)
+            textWrapped("watchers:" + item.watchers) {
                 layoutGravity(END or BaseDSL.CENTER_VERTICAL)
-                text("watchers:" + item.watchers)
             }
             onClick {
                 r(item)

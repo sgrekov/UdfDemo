@@ -3,6 +3,7 @@ package com.udf.showcase
 import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -33,31 +34,48 @@ fun textInputEditHack(id: Int, f: () -> Unit) {
     }
 }
 
-fun verticalLayout(r: () -> Unit) {
+fun box(r: () -> Unit) {
+    frameLayout {
+        size(MATCH, MATCH)
+        r()
+    }
+}
+
+fun column(stretched : Boolean = true, r: () -> Unit) {
     linearLayout {
-        size(MATCH, WRAP)
+        if (stretched) {
+            size(MATCH, WRAP)
+        } else {
+            size(WRAP, WRAP)
+        }
         orientation(LinearLayout.VERTICAL)
         r()
     }
 }
 
-fun horizontalLayout(r: () -> Unit) {
-    linearLayout {
-        size(MATCH, WRAP)
-        orientation(LinearLayout.HORIZONTAL)
+fun textWrapped(text : String?, r : () -> Unit) {
+    textView {
+        BaseDSL.size(WRAP, WRAP)
+        text(text)
         r()
     }
 }
 
-fun column(r: () -> Unit) {
-    linearLayout {
-        orientation(LinearLayout.VERTICAL)
+fun textWrapped(@StringRes textRes : Int, r : () -> Unit) {
+    textView {
+        BaseDSL.size(WRAP, WRAP)
+        text(textRes)
         r()
     }
 }
 
-fun row(r: () -> Unit) {
+fun row(stretched : Boolean = false, r: () -> Unit) {
     linearLayout {
+        if (stretched) {
+            size(MATCH, WRAP)
+        } else {
+            size(WRAP, WRAP)
+        }
         orientation(LinearLayout.HORIZONTAL)
         r()
     }

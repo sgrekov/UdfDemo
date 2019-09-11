@@ -5,11 +5,12 @@ import android.text.InputType
 import androidx.core.view.ViewCompat
 import com.udf.showcase.core.BaseRenderable
 import com.udf.showcase.R
+import com.udf.showcase.box
 import com.udf.showcase.column
 import com.udf.showcase.marginTop
 import com.udf.showcase.textInputEditHack
+import com.udf.showcase.textWrapped
 import com.udf.showcase.toolbarWidget
-import com.udf.showcase.verticalLayout
 import trikita.anvil.BaseDSL.MATCH
 import trikita.anvil.BaseDSL.size
 import trikita.anvil.DSL
@@ -25,14 +26,14 @@ class LoginRenderable(context: Context) : BaseRenderable<LoginState>(context) {
     lateinit var loginClickListener: LoginClickListener
 
     override fun view() {
-        verticalLayout {
+        column {
             toolbarWidget("Unidirectional Dataflow Showcase")
-            frameLayout {
-                size(MATCH, MATCH)
+            box {
                 padding(dip(30), dip(30))
-                column {
+
+                column(true) {
                     MaterialDSL.textInputLayout {
-                        DSL.size(DSL.MATCH, WRAP)
+                        size(DSL.MATCH, WRAP)
                         hint(context.getString(R.string.e_mail_address))
                         MaterialDSL.error(model.loginError)
                         textInputEditHack(emailId) {
@@ -44,7 +45,7 @@ class LoginRenderable(context: Context) : BaseRenderable<LoginState>(context) {
                         }
                     }
                     MaterialDSL.textInputLayout {
-                        DSL.size(DSL.MATCH, WRAP)
+                        size(DSL.MATCH, WRAP)
                         hint(context.getString(R.string.password))
                         marginTop(dip(20))
                         MaterialDSL.passwordVisibilityToggleEnabled(true)
@@ -83,9 +84,7 @@ class LoginRenderable(context: Context) : BaseRenderable<LoginState>(context) {
                         layoutGravity(CENTER_HORIZONTAL)
                         visibility(model.isLoading)
                     }
-                    textView {
-                        size(WRAP, WRAP)
-                        text(model.error)
+                    textWrapped(model.error) {
                         visibility(model.error != null)
                     }
 

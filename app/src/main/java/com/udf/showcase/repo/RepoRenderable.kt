@@ -5,8 +5,8 @@ import com.udf.showcase.core.BaseRenderable
 import com.udf.showcase.FontStyle
 import com.udf.showcase.column
 import com.udf.showcase.marginTop
+import com.udf.showcase.textWrapped
 import com.udf.showcase.toolbarWidget
-import com.udf.showcase.verticalLayout
 import trikita.anvil.BaseDSL
 import trikita.anvil.DSL.*
 
@@ -14,32 +14,29 @@ class RepoRenderable(c: Context) : BaseRenderable<RepoState>(c) {
 
     override fun view() {
         column {
-            size(MATCH, MATCH)
 
             toolbarWidget(if (model.isLoading) "Loading.." else model.repository?.name ?: "")
 
             progressBar {
                 size(WRAP, WRAP)
-                BaseDSL.layoutGravity(BaseDSL.CENTER)
+                layoutGravity(BaseDSL.CENTER)
                 visibility(model.isLoading)
             }
 
-            verticalLayout {
+            column {
                 margin(dip(8))
                 model.repository?.let { repo ->
-                    textView {
+
+                    textWrapped("Owner : ${repo.owner.login}") {
                         FontStyle.header()
-                        text("Owner : ${repo.owner.login}")
                     }
-                    textView {
+                    textWrapped(" ${repo.watchers} watchers") {
                         marginTop(dip(5))
                         FontStyle.small()
-                        text(" ${repo.watchers} watchers")
                     }
-                    textView {
+                    textWrapped(repo.description) {
                         marginTop(dip(5))
                         FontStyle.small()
-                        text(repo.description)
                     }
                 }
 
