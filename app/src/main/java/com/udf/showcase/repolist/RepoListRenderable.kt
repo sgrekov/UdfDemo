@@ -8,7 +8,6 @@ import com.udf.showcase.column
 import com.udf.showcase.marginTop
 import com.udf.showcase.toolbarWidget
 import org.eclipse.egit.github.core.Repository
-import timber.log.Timber
 import trikita.anvil.BaseDSL
 import trikita.anvil.DSL.*
 import trikita.anvil.RenderableAdapter
@@ -68,7 +67,7 @@ class RepoListRenderable(context: Context) : BaseRenderable<RepoListState>(conte
     }
 
     override fun updateAdapter() {
-        if (reposAdapter.itemCount != model.reposList.size) {
+        if (reposAdapter.items !== model.reposList) {
             reposAdapter.items = model.reposList
             reposAdapter.notifyDataSetChanged()
         }
@@ -86,7 +85,6 @@ class RepoListRenderable(context: Context) : BaseRenderable<RepoListState>(conte
     }
 
     private fun repoListItem(item: Repository, r: (Repository) -> Unit) {
-        Timber.tag("updateAdapter").d("repoListItem name:${item.name}")
         frameLayout {
             size(MATCH, dip(50))
             textView {

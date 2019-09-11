@@ -2,6 +2,7 @@ package com.udf.showcase.repo
 
 import android.content.Context
 import com.factorymarket.rxelm.cmd.Cmd
+import com.factorymarket.rxelm.contract.Update
 import com.factorymarket.rxelm.msg.Msg
 import com.udf.showcase.core.BaseFragment
 import com.udf.showcase.core.BaseRenderable
@@ -42,6 +43,6 @@ class RepoFragment : BaseFragment<RepoState>() {
         else -> noEffect()
     }
 
-    override fun update(msg: Msg, state: RepoState): Pair<RepoState, Cmd> = repoUpdate(msg, state)
+    override fun update(msg: Msg, state: RepoState): Update<RepoState> = repoUpdate(msg, state)
 
 }

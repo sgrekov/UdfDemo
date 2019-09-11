@@ -57,7 +57,7 @@ interface AppComponent {
                 .logger(object : RxElmLogger {
 
                     override fun logType(): LogType {
-                        return LogType.All
+                        return LogType.UpdatesAndCommands
                     }
 
                     override fun error(stateName: String, t: Throwable) {

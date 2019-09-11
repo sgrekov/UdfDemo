@@ -2,6 +2,7 @@ package com.udf.showcase.login
 
 import android.content.Context
 import com.factorymarket.rxelm.cmd.Cmd
+import com.factorymarket.rxelm.contract.Update
 import com.factorymarket.rxelm.msg.Msg
 import com.udf.showcase.core.BaseFragment
 import com.udf.showcase.core.BaseRenderable
@@ -33,7 +34,7 @@ class LoginFragment : BaseFragment<LoginState>(), LoginClickListener {
     override fun initialState(): LoginState =
         LoginState()
 
-    override fun update(msg: Msg, state: LoginState): Pair<LoginState, Cmd> {
+    override fun update(msg: Msg, state: LoginState): Update<LoginState> {
         return loginUpdate(msg, state)
     }
 
