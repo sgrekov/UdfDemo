@@ -1,7 +1,7 @@
 package com.udf.showcase.navigation
 
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
+import androidx.fragment.app.FragmentActivity
 import com.udf.showcase.MAIN_TAG
 import com.udf.showcase.R
 import com.udf.showcase.REPO_TAG
@@ -9,7 +9,6 @@ import com.udf.showcase.main.view.MainFragment
 import com.udf.showcase.repo.view.RepoFragment
 import com.udf.showcase.repo.view.RepoFragment.Companion.REPO_ID_KEY
 import org.eclipse.egit.github.core.Repository
-import org.eclipse.egit.github.core.RepositoryId
 
 
 class AndroidNavigator(private val activity: FragmentActivity) : Navigator {

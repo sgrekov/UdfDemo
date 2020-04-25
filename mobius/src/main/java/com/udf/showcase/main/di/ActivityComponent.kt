@@ -1,6 +1,6 @@
 package com.udf.showcase.main.di
 
-import android.support.v4.app.FragmentActivity
+import androidx.fragment.app.FragmentActivity
 import com.udf.showcase.login.view.LoginFragment
 import com.udf.showcase.main.view.MainFragment
 import com.udf.showcase.navigation.AndroidNavigator

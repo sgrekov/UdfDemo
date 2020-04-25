@@ -2,8 +2,6 @@ package com.udf.showcase.login.view
 
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.TextInputEditText
-import android.support.design.widget.TextInputLayout
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -11,9 +9,11 @@ import android.widget.CheckBox
 import android.widget.ProgressBar
 import android.widget.TextView
 import butterknife.BindView
-import com.jakewharton.rxbinding2.view.RxView
-import com.jakewharton.rxbinding2.widget.RxCompoundButton
-import com.jakewharton.rxbinding2.widget.RxTextView
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
+import com.jakewharton.rxbinding3.view.clicks
+import com.jakewharton.rxbinding3.widget.checkedChanges
+import com.jakewharton.rxbinding3.widget.textChanges
 import com.spotify.mobius.EventSource
 import com.spotify.mobius.First
 import com.spotify.mobius.MobiusLoop
@@ -91,13 +91,13 @@ class LoginFragment : BaseFragment() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { render(it) }
 
-        val loginBtnClick = RxView.clicks(loginBtn)
+        val loginBtnClick = loginBtn.clicks()
             .map { LoginClickEvent as LoginEvent }
-        val loginText = RxTextView.textChanges(loginText)
+        val loginText = loginText.textChanges()
             .map { LoginInputEvent(it.toString()) as LoginEvent }
-        val passText = RxTextView.textChanges(passwordText)
+        val passText = passwordText.textChanges()
             .map { PassInputEvent(it.toString()) as LoginEvent }
-        val saveCreds = RxCompoundButton.checkedChanges(saveCredentialsCb)
+        val saveCreds = saveCredentialsCb.checkedChanges()
             .map { IsSaveCredentialsEvent(it) }
 
         return Observable

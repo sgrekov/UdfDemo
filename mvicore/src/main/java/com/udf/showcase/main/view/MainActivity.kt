@@ -1,7 +1,7 @@
 package com.udf.showcase.main.view
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.udf.showcase.LOGIN_TAG
 import com.udf.showcase.MAIN_TAG
 import com.udf.showcase.R

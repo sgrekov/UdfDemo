@@ -2,8 +2,6 @@ package com.udf.showcase.login.view
 
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.TextInputEditText
-import android.support.design.widget.TextInputLayout
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -11,7 +9,9 @@ import butterknife.BindView
 import com.badoo.mvicore.android.AndroidBinderLifecycle
 import com.badoo.mvicore.binder.Binder
 import com.badoo.mvicore.binder.using
-import com.jakewharton.rxbinding2.widget.RxTextView
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
+import com.jakewharton.rxbinding3.widget.textChanges
 import com.udf.showcase.BaseFragment
 import com.udf.showcase.R
 import com.udf.showcase.login.model.LoginUiEvent
@@ -59,10 +59,10 @@ class LoginFragment : BaseFragment<LoginUiEvent>(), Consumer<LoginFeature.LoginS
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewDisposables.add(
-            RxTextView.textChanges(loginText).doOnNext { onNext(LoginUiEvent.LoginEvent(it.toString())) }.subscribe()
+            loginText.textChanges().doOnNext { onNext(LoginUiEvent.LoginEvent(it.toString())) }.subscribe()
         )
         viewDisposables.add(
-            RxTextView.textChanges(passwordText).doOnNext { onNext(LoginUiEvent.PassEvent(it.toString())) }.subscribe()
+            passwordText.textChanges().doOnNext { onNext(LoginUiEvent.PassEvent(it.toString())) }.subscribe()
         )
         loginBtn.setOnClickListener { onNext(LoginUiEvent.LoginClickEvent) }
         saveCredentialsCb.setOnCheckedChangeListener { buttonView, isChecked ->

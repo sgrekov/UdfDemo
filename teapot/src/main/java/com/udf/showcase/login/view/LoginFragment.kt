@@ -2,8 +2,6 @@ package com.udf.showcase.login.view
 
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.TextInputEditText
-import android.support.design.widget.TextInputLayout
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -11,11 +9,13 @@ import android.widget.CheckBox
 import android.widget.ProgressBar
 import android.widget.TextView
 import butterknife.BindView
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
+import com.jakewharton.rxbinding3.widget.textChanges
 import com.udf.showcase.BaseFragment
 import com.udf.showcase.R
 import com.udf.showcase.login.di.LoginModule
 import com.udf.showcase.login.presenter.LoginFeature
-import com.jakewharton.rxbinding2.widget.RxTextView
 import javax.inject.Inject
 
 class LoginFragment : BaseFragment(), ILoginView {
@@ -43,8 +43,8 @@ class LoginFragment : BaseFragment(), ILoginView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewDisposables.add(feature.addLoginInput(RxTextView.textChanges(loginText)))
-        viewDisposables.add(feature.addPasswordInput(RxTextView.textChanges(passwordText)))
+        viewDisposables.add(feature.addLoginInput(loginText.textChanges()))
+        viewDisposables.add(feature.addPasswordInput(passwordText.textChanges()))
         loginBtn.setOnClickListener { feature.loginBtnClick() }
         saveCredentialsCb.setOnCheckedChangeListener { buttonView, isChecked ->
             hideKeyboard()

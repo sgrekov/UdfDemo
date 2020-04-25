@@ -1,17 +1,17 @@
 package com.udf.showcase.main.view
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
-import com.jakewharton.rxbinding2.view.RxView
+import com.jakewharton.rxbinding3.view.clicks
 import com.spotify.mobius.First.first
 import com.spotify.mobius.MobiusLoop
 import com.spotify.mobius.android.AndroidLogger
@@ -85,10 +85,10 @@ class MainFragment : BaseFragment() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { render(it) }
 
-        val refreshBtnClick = RxView.clicks(refreshBtn)
+        val refreshBtnClick = refreshBtn.clicks()
             .map { RefreshEvent as MainEvent }
 
-        val cancelBtnClick = RxView.clicks(cancelBtn)
+        val cancelBtnClick = cancelBtn.clicks()
             .map { CancelEvent as MainEvent }
 
         return Observable
