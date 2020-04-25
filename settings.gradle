@@ -1,5 +1,5 @@
 include ':data'
-//include ':teapot'
+include ':teapot'
 include ':teapotwithinkremental'
-//include ':mobius'
-//include ':mvicore'
+include ':mobius'
+include ':mvicore'
