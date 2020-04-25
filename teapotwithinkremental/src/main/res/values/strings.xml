@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Unidirectional Dataflow Showcase</string>
+    <string name="e_mail_address">Enter your login</string>
+    <string name="password">Enter your password</string>
+    <string name="no_repos">User has no starred repos</string>
+</resources>
