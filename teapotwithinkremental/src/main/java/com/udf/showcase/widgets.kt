@@ -36,10 +36,9 @@ fun ViewScope.textInputEditHack(id: Int, f: TextViewScope.() -> Unit) {
             this.childCount,
             LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         )
-    }
-
-    withId(id) {
-        f(TextViewScope)
+        withId(id) {
+            f(TextViewScope)
+        }
     }
 }
 
