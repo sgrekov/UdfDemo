@@ -1,6 +1,7 @@
 package com.udf.showcase.repolist
 
 import android.content.Context
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.udf.showcase.box
 import com.udf.showcase.core.BaseRenderable
@@ -24,6 +25,8 @@ class RepoListRenderable(context: Context) : BaseRenderable<RepoListState>(conte
 
     lateinit var repoListClickListener: RepoListClickListener
     private var reposAdapter = createAdapter(listOf())
+
+    var listId = ViewCompat.generateViewId()
 
     override var renderable =  {
         column {
@@ -56,6 +59,7 @@ class RepoListRenderable(context: Context) : BaseRenderable<RepoListState>(conte
                     onClick { repoListClickListener.cancel() }
                 }
                 recyclerView {
+                    id(listId)
                     size(MATCH, MATCH)
                     margin(top = 50.dp)
                     padding(4.dp)
